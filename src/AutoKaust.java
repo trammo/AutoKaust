@@ -2,23 +2,19 @@ import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 
 import javax.swing.JButton;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JTextArea;
-import javax.swing.UIManager;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.JTextField;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
-import javax.swing.JTextPane;
+import javax.swing.UIManager;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class AutoKaust {
 
@@ -84,7 +80,7 @@ public class AutoKaust {
         txtWorkName.setBounds(10, 48, 116, 22);
         frame.getContentPane().add(txtWorkName);
         
-        JLabel lblSisestaTNimi = new JLabel("Sisesta töö nimi");
+        JLabel lblSisestaTNimi = new JLabel("Sisesta tÃ¶Ã¶ nimi");
         lblSisestaTNimi.setBounds(135, 51, 214, 16);
         frame.getContentPane().add(lblSisestaTNimi);
         
@@ -97,7 +93,7 @@ public class AutoKaust {
         listWorkType.setBounds(12, 83, 116, 95);
         frame.getContentPane().add(listWorkType);
         
-        JLabel lblValiTLiik = new JLabel("Vali töö liik");
+        JLabel lblValiTLiik = new JLabel("Vali tÃ¶Ã¶ liik");
         lblValiTLiik.setBounds(135, 80, 214, 16);
         frame.getContentPane().add(lblValiTLiik);
         
