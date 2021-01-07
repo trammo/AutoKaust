@@ -2,6 +2,7 @@ import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
@@ -12,9 +13,11 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.filechooser.FileSystemView;
 
 public class AutoKaust {
 
@@ -66,49 +69,61 @@ public class AutoKaust {
         
         textWorkNumber = new JTextField();
         textWorkNumber.setText("xx");
-        textWorkNumber.setBounds(10, 13, 116, 22);
+        textWorkNumber.setBounds(10, 13, 264, 22);
         frame.getContentPane().add(textWorkNumber);
         textWorkNumber.setColumns(10);
         
         JLabel lblSisestaTNumber = new JLabel("Sisesta t\u00F6\u00F6 number");
-        lblSisestaTNumber.setBounds(135, 16, 214, 16);
+        lblSisestaTNumber.setBounds(288, 16, 214, 16);
         frame.getContentPane().add(lblSisestaTNumber);
         
         txtWorkName = new JTextField();
         txtWorkName.setText("xxxx");
         txtWorkName.setColumns(10);
-        txtWorkName.setBounds(10, 48, 116, 22);
+        txtWorkName.setBounds(10, 48, 264, 22);
         frame.getContentPane().add(txtWorkName);
         
         JLabel lblSisestaTNimi = new JLabel("Sisesta töö nimi");
-        lblSisestaTNimi.setBounds(135, 51, 214, 16);
+        lblSisestaTNimi.setBounds(288, 51, 214, 16);
         frame.getContentPane().add(lblSisestaTNimi);
         
-        JList list = new JList();
-        list.setBounds(42, 111, 1, 1);
-        frame.getContentPane().add(list);
         
-        JList listWorkType = new JList();
+        String documentsPath = FileSystemView.getFileSystemView().getDefaultDirectory().getPath();
+        String projectTempaltesRoot = documentsPath + "\\Kaustade_automatiseerimine";
+		File directoryPath = new File(projectTempaltesRoot);
+        //List of all files and directories
+        String contents[] = directoryPath.list();
+        
+        JList listWorkType = new JList(contents);
         listWorkType.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        listWorkType.setBounds(12, 83, 116, 95);
+        listWorkType.setBounds(12, 83, 264, 212);
         frame.getContentPane().add(listWorkType);
         
         JLabel lblValiTLiik = new JLabel("Vali töö liik");
-        lblValiTLiik.setBounds(135, 80, 214, 16);
+        lblValiTLiik.setBounds(288, 80, 214, 16);
         frame.getContentPane().add(lblValiTLiik);
         
         textArea = new JTextArea();
-        textArea.setBounds(10, 207, 761, 250);
+        textArea.setBounds(10, 308, 761, 149);
         textArea.setLineWrap(true);
         textArea.setEditable(false);
         frame.getContentPane().add(textArea);
         
         
-        try {
-            initializeReplacementsConfig();
-        } catch (Exception e) {
-            textArea.setText(e.getMessage());
-        }
+        
+//        listWorkType.setdata(new ListModel<String>() {
+//		});
+//        System.out.println("List of files and directories in the specified directory:");
+//        for(int i=0; i<contents.length; i++) {
+//           System.out.println(contents[i]);
+//        }
+
+        
+//        try {
+//            initializeReplacementsConfig();
+//        } catch (Exception e) {
+//            textArea.setText(e.getMessage());
+//        }
     }
 
     private void initializeReplacementsConfig() throws IOException {
@@ -195,13 +210,13 @@ public class AutoKaust {
     
     private void showResult(String text) {
         textArea.setText(text);
-        makePopup(text);    
+//        makePopup(text);    
     }
     
-    private void makePopup(String text) {
-        Popup popup = new Popup();
-        popup.setText(text);
-        popup.setVisible(true);
-        popup.toFront();
-    }
+//    private void makePopup(String text) {
+//        Popup popup = new Popup();
+//        popup.setText(text);
+//        popup.setVisible(true);
+//        popup.toFront();
+//    }
 }
