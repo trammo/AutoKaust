@@ -20,24 +20,27 @@ import javax.swing.UIManager;
 import javax.swing.filechooser.FileSystemView;
 
 import org.apache.commons.io.FileUtils;
+import javax.swing.JCheckBox;
 
 public class AutoKaust {
 
 	private JFrame frame;
-	private JTextArea textArea;
+	private JTextArea logArea;
 
-	HashMap<String, String> codeReplacementsMap;
-	String APP_HEADER = "AutoKaust v1.0";
-	String RESULT_FILE_SUFFIX = "MKMBlokid";
-	String CONFIG_FILE_NAME = "config.txt";
+	String APP_HEADER = "AutoKaust v1.1";
 	private JTextField textWorkNumber;
 	private JTextField textWorkName;
-	private JList listWorkTypes;
+	private JList<String> listWorkTypes;
 
+	private JCheckBox chckbxMootala;
+	private JCheckBox chckbxKaevud;
+	private JCheckBox chckbxYksikpuud;
+	private JCheckBox chckbxMaamudel;
+	
 	private final String TO_BE_REPLACED = "xxxx-xx";
-
+	private final String FOLDER_SEPARATOR = "//";
+	
 	private String CURRENT_DIRECTORY;
-	private String HOME_DIRECTORY;
 	private String TEMPLATES_ROOT;
 
 	public static void main(String[] args) {
@@ -64,20 +67,18 @@ public class AutoKaust {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 
-		textArea = new JTextArea();
-		textArea.setBounds(10, 308, 761, 149);
-		textArea.setLineWrap(true);
-		textArea.setEditable(false);
-		frame.getContentPane().add(textArea);
+		logArea = new JTextArea();
+		logArea.setBounds(12, 390, 761, 149);
+		logArea.setLineWrap(true);
+		logArea.setEditable(false);
+		frame.getContentPane().add(logArea);
 
 		CURRENT_DIRECTORY = new File("").getAbsolutePath();
 		String documentsPath = FileSystemView.getFileSystemView().getDefaultDirectory().getPath();
-		TEMPLATES_ROOT = documentsPath + "//Kaustade_automatiseerimine";
-
-		HOME_DIRECTORY = System.getProperty("user.home");
+		TEMPLATES_ROOT = documentsPath + FOLDER_SEPARATOR + "Kaustade_automatiseerimine";
 
 		JButton btnTekitaKaustad = new JButton("Tekita kaustad");
-		btnTekitaKaustad.setBounds(10, 470, 765, 78);
+		btnTekitaKaustad.setBounds(12, 552, 765, 55);
 		btnTekitaKaustad.setBackground(UIManager.getColor("InternalFrame.activeTitleGradient"));
 		btnTekitaKaustad.addActionListener(new CreateFoldersActionListener());
 
@@ -107,19 +108,37 @@ public class AutoKaust {
 		// List of all files and directories
 		String contents[] = directoryPath.list();
 
+		
 		if (contents == null || contents.length == 0) {
-			showResult("No template folders forund from " + TEMPLATES_ROOT);
-		} else {
-			listWorkTypes = new JList(contents);
-			listWorkTypes.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-			listWorkTypes.setBounds(12, 83, 264, 212);
-			frame.getContentPane().add(listWorkTypes);
-
+			logMessage("No template folders forund from " + TEMPLATES_ROOT);
+			return; // avoids NullPointerException from the following new JList(contents) creation with empty array.
 		}
+		
+		listWorkTypes = new JList(contents);
+		listWorkTypes.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		listWorkTypes.setBounds(12, 83, 264, 171);
+		frame.getContentPane().add(listWorkTypes);
+		
 
 		JLabel lblValiTLiik = new JLabel("Vali töö liik");
 		lblValiTLiik.setBounds(288, 80, 214, 16);
 		frame.getContentPane().add(lblValiTLiik);
+		
+		chckbxMootala = new JCheckBox("Mõõtala");
+		chckbxMootala.setBounds(12, 263, 113, 25);
+		frame.getContentPane().add(chckbxMootala);
+		
+		chckbxKaevud = new JCheckBox("Kaevud");
+		chckbxKaevud.setBounds(12, 288, 113, 25);
+		frame.getContentPane().add(chckbxKaevud);
+		
+		chckbxYksikpuud = new JCheckBox("Üksikpuud");
+		chckbxYksikpuud.setBounds(12, 310, 113, 25);
+		frame.getContentPane().add(chckbxYksikpuud);
+		
+		chckbxMaamudel = new JCheckBox("Maamudel");
+		chckbxMaamudel.setBounds(12, 335, 113, 25);
+		frame.getContentPane().add(chckbxMaamudel);
 
 	}
 
@@ -130,25 +149,55 @@ public class AutoKaust {
 
 			String selectedWorkType = listWorkTypes.getSelectedValue().toString();
 
-			String source = TEMPLATES_ROOT + "//" + selectedWorkType;
+			String source = TEMPLATES_ROOT + FOLDER_SEPARATOR + selectedWorkType;
 			File srcDir = new File(source);
 
 			String destinationFolderName = selectedWorkType.replace(TO_BE_REPLACED, toReplace);
-			String destination = CURRENT_DIRECTORY + "//" + destinationFolderName;
-			File destDir = new File(destination);
+			String destinationFolder = CURRENT_DIRECTORY + FOLDER_SEPARATOR + destinationFolderName;
+			File destDir = new File(destinationFolder);
 
 			try {
 				FileUtils.copyDirectory(srcDir, destDir);
-				showResult("Created folder " + destDir + " with contents from the template");
+				logMessage("Created folder " + destDir + " with contents from the template");
 			} catch (IOException ex) {
-				showResult(ex.toString());
+				logMessage(ex.toString());
 			}
-
-			renameFiles(destination, TO_BE_REPLACED, toReplace);
+			
+			// rename the files that contain the TO_BE_REPLACED pathpattern
+			renameFiles(destinationFolder, TO_BE_REPLACED, toReplace);
+			
+			// create the empty .txt files 
+			if (chckbxMootala.isSelected()) {
+				createEmptyFile(destinationFolder, "Mõõtala.txt");
+			}
+			
+			if (chckbxKaevud.isSelected()) {
+				createEmptyFile(destinationFolder, "Kaevud.txt");
+			}
+			
+			if (chckbxYksikpuud.isSelected()) {
+				createEmptyFile(destinationFolder, "Üksikpuud.txt");
+			}
+			
+			if (chckbxMaamudel.isSelected()) {
+				createEmptyFile(destinationFolder, "Maamudel.txt");
+			}
+			
+			logMessage("All done!");
 		}
 	}
 
-	public void renameFiles(String dir, String replace, String replaceBy) {
+	private void createEmptyFile(String destinationFolder, String fileName) {
+		String filePath = destinationFolder + FOLDER_SEPARATOR + fileName;
+		try {
+			new File(filePath).createNewFile();
+			logMessage("Created empty file " + filePath);
+		} catch (IOException e) {
+			logMessage(e.toString());
+		}
+	}
+	
+	private void renameFiles(String dir, String replace, String replaceBy) {
 		try {
 			try (Stream<Path> stream = Files.find(Paths.get(dir), 10,
 					(path, attr) -> String.valueOf(path).contains(TO_BE_REPLACED))) {
@@ -157,7 +206,7 @@ public class AutoKaust {
 						Path sourcePath = new File(item).toPath();
 						Path destinationPath = new File(item.replace(replace, replaceBy)).toPath();
 						Files.move(sourcePath, destinationPath);
-						showResult("Created entity " + destinationPath.toString());
+						logMessage("Created entity " + destinationPath.toString());
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
@@ -165,11 +214,11 @@ public class AutoKaust {
 			}
 
 		} catch (IOException e) {
-			showResult(e.toString());
+			logMessage(e.toString());
 		}
 	}
 
-	private void showResult(String text) {
-		textArea.setText(text);
+	private void logMessage(String text) {
+		logArea.append(text + "\r\n");
 	}
 }
